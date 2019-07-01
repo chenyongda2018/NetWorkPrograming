@@ -150,6 +150,131 @@ public class MyRunnable implements Runnable{
 
 
 ### 放弃  
-通过 `Thread.yield()` 方法告诉虚拟机，如果有其他线程想要运行，那就让它们运行，主动放弃控制权。  
+通过 `Thread.yield()` 方法告诉虚拟机，我愿意暂停,如果有其他线程想要运行，那就让它们运行，主动放弃控制权。  
 
 ### 休眠  
+`yield()` 表达的是的一种可以放弃的意愿，而休眠是不管其他线程是否准备运行，休眠的线程都会暂停。但是进入休眠的线程依然拥有它已经获得的锁，所以，如果此线程在休眠前没有释放它已经获得的锁，那么其他需要相同锁的线程就会堵塞。  
+> 所以避免在同步方法块内让线程休眠。    
+
+使用  
+![](https://ws1.sinaimg.cn/large/9c347cably1g4k2a7hoiwj20ik02sgmi.jpg)  
+可以让线程进入休眠状态。  
+
+其他线程可以调用正在休眠的线程的 `interrupt()` 方法来唤醒它.  
+
+
+
+### join() 连接线程  
+![](https://ws1.sinaimg.cn/large/9c347cably1g4k2tco7u9j20hm02xmy4.jpg)  
+
+`join()`方法能够让线程在继续执行之前等待另一个线程执行结束。    
+`join(long i)`: 我只能等这么长时间，如果你还没结束，我就不等你，自己开始运行了。  
+例如: A线程想等待B线程执行结束后运行,那么就可以在A线程中调用B的`join()`方法。  
+
+下面的代码演示了如何让 主线程连接上子线程，让主线程等待子线程执行之后再执行。  
+```
+public class Thread2 extends Thread{
+
+    @Override
+    public void run() {
+        System.out.println("子线程开始执行");
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("子线程执行结束");
+    }
+}  
+
+
+public class TestJoin {
+
+    public static void main(String[] args) {
+        Thread2 thread2 = new Thread2();
+        thread2.start();
+        try {
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("主线程执行");
+    }
+}
+```  
+输出:  
+```
+子线程开始执行
+子线程执行结束
+主线程执行
+```  
+---
+
+### wait() 等待对象  
+
+![](https://ws1.sinaimg.cn/large/9c347cably1g4k3pq0024j20ig02v759.jpg)  
+下面一段代码演示 通过等待对象控制2个线程的执行顺序。
+```
+public static void main(String[] args) {
+        Person p = new Person("张三");
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (p) {
+                    System.out.println("线程1执行");
+                    try {
+                        System.out.println("线程1先等一会(进入休眠)，先让别人执行");
+                        p.wait();
+                        System.out.println("好耶，线程1可以执行了");
+                        System.out.println("线程1-" + p.getName());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (p) {
+                    System.out.println("线程2执行");
+                    p.setName("李四");
+                    p.notify();
+                }
+            }
+        }).start();
+    }
+```  
+
+输出:   
+```
+线程1执行
+线程1先等一会(进入休眠)，先让别人执行
+线程2执行
+好耶，线程1可以执行了
+线程1-李四
+```  
+
+`notify()` 会随机从等待对象中的线程列表中选择一个，`notifyAll()` 会唤醒所有线程。  
+
+---
+
+### 线程池  
+
+通过   
+
+```
+ExecutorService pool = Exevutors.newFixedThreadPool(2);
+pool.submit(runnable);
+pool.shutdown();
+```    
+
+`submit()` 可以将一个runnable对象添加到线程池中，当所有runnable对象都添加完成后，可以调用线程池的`shutdown()`方法. 
+
+
+
