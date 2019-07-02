@@ -4,7 +4,7 @@
 `URI` 是统一资源定位符,URL是最常见的URI.  
 
 
-### URI(Uniform Resource Identifier)  
+### 一,URI(Uniform Resource Identifier)  
 统一资源定位符,采用一种特定的语法标识一个资源的字符串.  
 - URI语法:  
 
@@ -19,7 +19,7 @@
 //authority/path?query
 ```  
 
-### URL  
+### 二,URL  
 是URI的一种,不仅可以标识一个资源，也为这个资源提供了在网络中的位置.  
 
 
@@ -38,8 +38,9 @@
 
 ---
 
-### URL类    
+### 三,URL类    
 `java.net.URL`是一个final类,不能对其派生,不可变,线程安全。  
+> 主要用于从网站下载内容.
 
 - 构造函数  
 
@@ -55,7 +56,7 @@
 ![](https://ws1.sinaimg.cn/large/9c347cably1g4kgaoaxwkj20kz03jabc.jpg)  
 
 
-### 从URL中获取数据  
+### 四,从URL中获取数据  
 api:  
 ![](https://ws1.sinaimg.cn/large/9c347cably1g4kh2u9xg8j20kf03l3zy.jpg)   
 
@@ -154,7 +155,24 @@ public static void main(String[] args) throws MalformedURLException {
 ```  
 
 
-可以看到文字可以正常地显示。
+可以看到文字可以正常地显示。  
+
+
+
+#### 2.openConnection()  
+
+通过URL.openConnection()方法可以与网站建立一个Socket连接，并返回一个`UrlConnection`对象。  
+
+
+#### 3.其他获取信息地api  
+
+![](https://ws1.sinaimg.cn/large/9c347cably1g4ljnfqahxj20mt03qwfs.jpg)  
+
+其中,`getRef()`返回url中地锚点信息,`getPath()`返回完整路径和文件名,`getFile()`返回带查询字符串地完整路径和文件名。`getQuery()`返回查询字符串.
+
+
+#### 4.判断两个URL实例是否相等  
+当2个URL都指向同一个主机,端口,路径,片段,查询字符串时,认为这两个URL实例是相等的.
 
 
 
